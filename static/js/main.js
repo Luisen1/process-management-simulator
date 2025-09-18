@@ -154,11 +154,35 @@ async function changeAlgorithm() {
             currentResults = null;
             updateProcessList();
             hideResults();
+            
+            // Actualizar interfaz según el algoritmo
+            updateAlgorithmInterface(selectedAlgorithm);
+            
+            // Mostrar mensaje específico sobre las diferencias
+            showAlgorithmDifferences(selectedAlgorithm);
         } else {
             showMessage(result.message, 'error');
         }
     } catch (error) {
         showMessage(`Error de conexión: ${error.message}`, 'error');
+    }
+}
+
+// Función para mostrar diferencias del algoritmo
+function showAlgorithmDifferences(algorithm) {
+    let message = '';
+    if (algorithm === 'SJF') {
+        message = `🔄 Cambiado a SJF: Los procesos se ordenarán por <strong>Burst Time</strong> (BT), no por Arrival Time (AT). 
+                   Esto optimiza el tiempo de espera pero puede causar "starvation" en procesos largos.`;
+    } else if (algorithm === 'FCFS') {
+        message = `🔄 Cambiado a FCFS: Los procesos se ordenarán por <strong>Arrival Time</strong> (AT), respetando el orden de llegada. 
+                   Es justo pero puede tener el "efecto convoy".`;
+    }
+    
+    if (message) {
+        setTimeout(() => {
+            showMessage(message, 'info');
+        }, 500);
     }
 }
 
@@ -173,6 +197,7 @@ async function loadCurrentState() {
         algorithSelect.value = state.algorithm;
         
         updateProcessList();
+        updateAlgorithmInterface(state.algorithm);
     } catch (error) {
         showMessage(`Error al cargar estado: ${error.message}`, 'error');
     }
@@ -198,6 +223,8 @@ function updateProcessList() {
 
 // Función para mostrar resultados
 function displayResults(results) {
+    const currentAlgorithm = document.getElementById('current-algorithm').textContent;
+    
     resultsSection.style.display = 'block';
     
     // Mostrar tabla de resultados
@@ -209,8 +236,40 @@ function displayResults(results) {
     // Mostrar métricas
     displayMetrics(results);
     
+    // Mostrar análisis específico del algoritmo
+    if (currentAlgorithm === 'SJF') {
+        showSJFAnalysis(results.processes);
+    } else if (currentAlgorithm === 'FCFS') {
+        showFCFSAnalysis(results);
+    }
+    
     // Scroll a resultados
     resultsSection.scrollIntoView({ behavior: 'smooth' });
+}
+
+// Función para análisis específico de SJF
+function showSJFAnalysis(processes) {
+    const sortedByBT = [...processes].sort((a, b) => a.burst_time - b.burst_time);
+    const executionOrder = processes.map(p => p.pid).join(' → ');
+    const btOrder = sortedByBT.map(p => `${p.pid}(BT:${p.burst_time})`).join(' → ');
+    
+    setTimeout(() => {
+        showMessage(
+            `📊 SJF: Ordenado por BT: ${btOrder} | Ejecutado: ${executionOrder}`, 
+            'info'
+        );
+    }, 1000);
+}
+
+// Función para análisis específico de FCFS
+function showFCFSAnalysis(results) {
+    const convoyInfo = results.convoy_effect_info || 'No se detectó efecto convoy';
+    setTimeout(() => {
+        showMessage(
+            `📊 FCFS: ${convoyInfo}`, 
+            'info'
+        );
+    }, 1000);
 }
 
 // Función para mostrar tabla de resultados
@@ -218,12 +277,19 @@ function displayResultsTable(processes) {
     const tbody = document.querySelector('#results-table tbody');
     tbody.innerHTML = '';
     
+    const currentAlgorithm = document.getElementById('current-algorithm').textContent;
+    
     processes.forEach(process => {
         const row = document.createElement('tr');
+        
+        // Aplicar clases específicas para SJF
+        const atClass = currentAlgorithm === 'SJF' ? 'at-column' : '';
+        const btClass = currentAlgorithm === 'SJF' ? 'bt-column' : '';
+        
         row.innerHTML = `
             <td class="process-cell">${process.pid}</td>
-            <td>${process.arrival_time}</td>
-            <td>${process.burst_time}</td>
+            <td class="${atClass}">${process.arrival_time}</td>
+            <td class="${btClass}">${process.burst_time}</td>
             <td>${process.completion_time}</td>
             <td>${process.turnaround_time}</td>
             <td>${process.waiting_time}</td>
@@ -300,7 +366,60 @@ function getProcessColor(pid) {
     return colors[Math.abs(hash) % colors.length];
 }
 
-// Función para mostrar métricas
+// Función para ocultar resultados
+function hideResults() {
+    resultsSection.style.display = 'none';
+}
+
+// Función para actualizar la interfaz según el algoritmo
+function updateAlgorithmInterface(algorithm) {
+    const body = document.body;
+    const fcfsInfo = document.getElementById('fcfs-info');
+    const sjfInfo = document.getElementById('sjf-info');
+    
+    // Remover clases previas
+    body.classList.remove('sjf-mode', 'fcfs-mode');
+    
+    // Ocultar todas las secciones de información
+    if (fcfsInfo) fcfsInfo.style.display = 'none';
+    if (sjfInfo) sjfInfo.style.display = 'none';
+    
+    // Aplicar configuración específica del algoritmo
+    if (algorithm === 'SJF') {
+        body.classList.add('sjf-mode');
+        if (sjfInfo) sjfInfo.style.display = 'block';
+        
+        // Mostrar advertencia sobre reordenamiento
+        showSJFWarning();
+    } else if (algorithm === 'FCFS') {
+        body.classList.add('fcfs-mode');
+        if (fcfsInfo) fcfsInfo.style.display = 'block';
+    }
+}
+
+// Función para mostrar advertencia de SJF
+function showSJFWarning() {
+    // Remover advertencia previa si existe
+    const existingWarning = document.querySelector('.sjf-reorder-indicator');
+    if (existingWarning) {
+        existingWarning.remove();
+    }
+    
+    // Crear nueva advertencia
+    const warning = document.createElement('div');
+    warning.className = 'sjf-reorder-indicator';
+    warning.innerHTML = `
+        <i class="fas fa-sort-amount-down"></i>
+        <strong>Algoritmo SJF Activo:</strong> Los procesos se ordenarán por Burst Time (BT), 
+        ignorando el Arrival Time (AT). Esto puede causar "starvation" en procesos largos.
+    `;
+    
+    // Insertar antes de la sección de resultados
+    const resultsSection = document.getElementById('results-section');
+    resultsSection.parentNode.insertBefore(warning, resultsSection);
+}
+
+// Función para mostrar métricas (actualizada para SJF)
 function displayMetrics(results) {
     document.getElementById('avg-waiting-time').textContent = 
         results.average_waiting_time.toFixed(2) + ' unidades';
@@ -308,11 +427,7 @@ function displayMetrics(results) {
     document.getElementById('avg-turnaround-time').textContent = 
         results.average_turnaround_time.toFixed(2) + ' unidades';
     
-    document.getElementById('convoy-effect').textContent = 
-        results.convoy_effect_info;
-}
-
-// Función para ocultar resultados
-function hideResults() {
-    resultsSection.style.display = 'none';
+    // Mostrar información específica del algoritmo
+    const analysisText = results.algorithm_analysis || results.convoy_effect_info || 'N/A';
+    document.getElementById('convoy-effect').textContent = analysisText;
 }
