@@ -303,7 +303,15 @@ function displayResults(results) {
     
     // Mostrar estadísticas si están disponibles
     if (results.statistics) {
+        console.log('Mostrando estadísticas para:', currentAlgorithm, results.statistics);
         displayStatistics(results.statistics);
+    } else {
+        console.log('No hay estadísticas disponibles para:', currentAlgorithm);
+        // Ocultar la sección de estadísticas si no hay datos
+        const statisticsSection = document.getElementById('statistics-section');
+        if (statisticsSection) {
+            statisticsSection.style.display = 'none';
+        }
     }
     
     // Mostrar análisis específico del algoritmo
@@ -465,6 +473,12 @@ function getProcessColor(pid) {
 // Función para ocultar resultados
 function hideResults() {
     resultsSection.style.display = 'none';
+    
+    // También ocultar la sección de estadísticas
+    const statisticsSection = document.getElementById('statistics-section');
+    if (statisticsSection) {
+        statisticsSection.style.display = 'none';
+    }
 }
 
 // Función para actualizar la interfaz según el algoritmo
