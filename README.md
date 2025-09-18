@@ -7,7 +7,7 @@ Una aplicación web interactiva desarrollada en **Flask** que simula algoritmos 
 ### 🎯 Algoritmos Implementados
 - **FCFS (First-Come, First-Served)**: Algoritmo justo que respeta el orden de llegada
 - **SJF (Shortest Job First)**: Algoritmo óptimo que prioriza procesos con menor tiempo de ráfaga
-- **🔄 Round Robin**: Algoritmo preemptivo con quantum configurable y análisis de eficiencia
+- **Round Robin**: Algoritmo preemptivo con quantum configurable y análisis de eficiencia
 
 ### 📊 Visualizaciones Interactivas
 - **Diagramas de Gantt**: Representación visual de la ejecución de procesos
