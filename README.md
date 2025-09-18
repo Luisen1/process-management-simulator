@@ -1,19 +1,24 @@
 # 🖥️ Simulador de Gestión de Procesos
 
-Una aplicación web interactiva desarrollada en **Flask** que simula algoritmos de planificación de procesos para sistemas operativos. Implementa los algoritmos **FCFS (First-Come, First-Served)** y **SJF (Shortest Job First)** con visualizaciones en tiempo real.
+Una aplicación web interactiva desarrollada en **Flask** que simula algoritmos de planificación de procesos para sistemas operativos. Implementa los algoritmos **FCFS**, **SJF** y **Round Robin** con visualizaciones en tiempo real y análisis estadístico completo.
 
 ## ✨ Características Principales
 
 ### 🎯 Algoritmos Implementados
 - **FCFS (First-Come, First-Served)**: Algoritmo justo que respeta el orden de llegada
 - **SJF (Shortest Job First)**: Algoritmo óptimo que prioriza procesos con menor tiempo de ráfaga
+- **🔄 Round Robin**: Algoritmo preemptivo con quantum configurable y análisis de eficiencia
 
 ### 📊 Visualizaciones Interactivas
 - **Diagramas de Gantt**: Representación visual de la ejecución de procesos
-- **Tablas de Resultados**: Métricas detalladas (AT, BT, CT, TT, WT)
+- **Tablas de Resultados**: Métricas detalladas (AT, BT, CT, TT, WT, QU)
+- **📈 Estadísticas Avanzadas**: Medias, desviaciones estándar, mínimos y máximos
 - **Indicadores Visuales**: Diferenciación por colores según el algoritmo
 
 ### 🛠️ Funcionalidades Avanzadas
+- **⚙️ Quantum Configurable**: Control dinámico del quantum para Round Robin (1-20)
+- **📊 Análisis Estadístico**: Cálculo automático de medias y desviaciones estándar
+- **🔄 Context Switching**: Contador y análisis de cambios de contexto en RR
 - **Ejemplos Predefinidos**: Casos que demuestran claramente las diferencias entre algoritmos
 - **Cambio Dinámico**: Alternancia entre algoritmos sin reiniciar la aplicación
 - **Análisis Automático**: Detección del efecto convoy y análisis de rendimiento
