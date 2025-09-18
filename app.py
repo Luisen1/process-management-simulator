@@ -119,7 +119,7 @@ def change_algorithm():
         new_algorithm = data.get('algorithm', 'FCFS').upper()
         
         # Verificar si el algoritmo es soportado
-        supported_algorithms = ['FCFS']  # Expandir cuando se añadan más
+        supported_algorithms = ['FCFS', 'SJF']  # Expandir cuando se añadan más
         if new_algorithm not in supported_algorithms:
             return jsonify({
                 'success': False, 
