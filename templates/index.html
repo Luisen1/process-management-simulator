@@ -20,8 +20,8 @@
                 <label for="algorithm-select">Seleccionar Algoritmo:</label>
                 <select id="algorithm-select">
                     <option value="FCFS" {% if current_algorithm == 'FCFS' %}selected{% endif %}>FCFS (First-Come, First-Served)</option>
+                    <option value="SJF" {% if current_algorithm == 'SJF' %}selected{% endif %}>SJF (Shortest Job First)</option>
                     <!-- Espacio para futuros algoritmos -->
-                    <option value="SJF" disabled>SJF (Próximamente)</option>
                     <option value="RR" disabled>Round Robin (Próximamente)</option>
                 </select>
                 <button id="change-algorithm-btn" class="btn btn-secondary">
@@ -130,20 +130,56 @@
 
     <!-- Explicación del algoritmo -->
     <div class="info-section">
-        <h3><i class="fas fa-info-circle"></i> Información del Algoritmo FCFS</h3>
+        <h3><i class="fas fa-info-circle"></i> Información del Algoritmo</h3>
         <div class="info-content">
-            <p><strong>First-Come, First-Served (FCFS)</strong> es el algoritmo de planificación más simple:</p>
-            <ul>
-                <li><strong>AT (Arrival Time):</strong> Momento en que el proceso llega al sistema</li>
-                <li><strong>BT (Burst Time):</strong> Tiempo que el proceso necesita para completarse</li>
-                <li><strong>CT (Completion Time):</strong> Momento en que el proceso termina su ejecución</li>
-                <li><strong>TT (Turnaround Time):</strong> CT - AT (tiempo total en el sistema)</li>
-                <li><strong>WT (Waiting Time):</strong> TT - BT (tiempo esperando para ejecutarse)</li>
-                <li><strong>Convoy Effect:</strong> Los procesos largos pueden retrasar significativamente a los cortos</li>
-            </ul>
+            <div id="fcfs-info" class="algorithm-info">
+                <p><strong>First-Come, First-Served (FCFS)</strong> es el algoritmo de planificación más simple:</p>
+                <ul>
+                    <li><strong>AT (Arrival Time):</strong> Momento en que el proceso llega al sistema</li>
+                    <li><strong>BT (Burst Time):</strong> Tiempo que el proceso necesita para completarse</li>
+                    <li><strong>CT (Completion Time):</strong> Momento en que el proceso termina su ejecución</li>
+                    <li><strong>TT (Turnaround Time):</strong> CT - AT (tiempo total en el sistema)</li>
+                    <li><strong>WT (Waiting Time):</strong> TT - BT (tiempo esperando para ejecutarse)</li>
+                    <li><strong>Convoy Effect:</strong> Los procesos largos pueden retrasar significativamente a los cortos</li>
+                </ul>
+                <div class="algorithm-characteristics">
+                    <h4><i class="fas fa-star"></i> Características de FCFS:</h4>
+                    <ul>
+                        <li>✅ <strong>Simple de implementar</strong> y entender</li>
+                        <li>✅ <strong>Justo:</strong> Respeta el orden de llegada</li>
+                        <li>⚠️ <strong>No óptimo:</strong> Puede tener tiempos de espera altos</li>
+                        <li>⚠️ <strong>Convoy Effect:</strong> Procesos largos bloquean a los cortos</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="sjf-info" class="algorithm-info" style="display: none;">
+                <p><strong>Shortest Job First (SJF)</strong> es un algoritmo "injusto" que prioriza la eficiencia sobre la equidad:</p>
+                <ul>
+                    <li><strong style="color: #e74c3c;">AT (Arrival Time):</strong> <span style="color: #e74c3c;">⚠️ NO se considera para el ordenamiento</span></li>
+                    <li><strong style="color: #27ae60;">BT (Burst Time):</strong> <span style="color: #27ae60;">✅ Criterio principal de ordenamiento (menor a mayor)</span></li>
+                    <li><strong>CT (Completion Time):</strong> Momento en que el proceso termina su ejecución</li>
+                    <li><strong>TT (Turnaround Time):</strong> CT - AT (tiempo total en el sistema)</li>
+                    <li><strong>WT (Waiting Time):</strong> TT - BT (tiempo esperando para ejecutarse)</li>
+                </ul>
+                <div class="algorithm-characteristics">
+                    <h4><i class="fas fa-star"></i> Características de SJF:</h4>
+                    <ul>
+                        <li>✅ <strong>Óptimo:</strong> Minimiza el tiempo promedio de espera</li>
+                        <li>✅ <strong>Eficiente:</strong> Mejores métricas de rendimiento</li>
+                        <li>⚠️ <strong>Injusto:</strong> Ignora el orden de llegada</li>
+                        <li>❌ <strong>Starvation:</strong> Procesos largos pueden no ejecutarse nunca</li>
+                        <li>❌ <strong>Imposible en práctica:</strong> Requiere conocer BT de antemano</li>
+                    </ul>
+                </div>
+                <div class="algorithm-warning">
+                    <h4><i class="fas fa-exclamation-triangle"></i> ¿Por qué es "Injusto"?</h4>
+                    <p>SJF prioriza los procesos más cortos sin importar cuándo llegaron. Un proceso que llega primero pero es largo puede ejecutarse después de procesos que llegaron mucho más tarde pero son más cortos. Esto viola el principio de "primero en llegar, primero en ser atendido".</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/examples.js') }}"></script>
 </body>
 </html>
