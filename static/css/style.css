@@ -535,6 +535,67 @@ body {
     color: #2c3e50;
 }
 
+/* Estilos para características del algoritmo */
+.algorithm-characteristics {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid #3498db;
+}
+
+.algorithm-characteristics h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.algorithm-characteristics h4 i {
+    color: #f39c12;
+    margin-right: 8px;
+}
+
+.algorithm-characteristics ul {
+    margin-left: 0;
+    list-style: none;
+}
+
+.algorithm-characteristics li {
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.algorithm-characteristics li:last-child {
+    border-bottom: none;
+}
+
+/* Estilos para advertencia de SJF */
+.algorithm-warning {
+    background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+    border: 1px solid #f1c40f;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid #e74c3c;
+}
+
+.algorithm-warning h4 {
+    color: #d35400;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.algorithm-warning h4 i {
+    color: #e74c3c;
+    margin-right: 8px;
+}
+
+.algorithm-warning p {
+    color: #8b4513;
+    line-height: 1.6;
+    margin: 0;
+}
+
 /* Animaciones */
 @keyframes slideIn {
     from {
@@ -545,6 +606,198 @@ body {
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+/* Estilos para sección de ejemplos */
+.examples-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 25px 0;
+    color: white;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.examples-header h3 {
+    color: white;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.examples-header h3 i {
+    color: #ffeaa7;
+    margin-right: 10px;
+}
+
+.examples-header p {
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.examples-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.example-btn {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.example-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.example-btn i {
+    font-size: 1.1rem;
+}
+
+.btn-primary.example-btn {
+    background: rgba(52, 152, 219, 0.8);
+    border-color: rgba(52, 152, 219, 0.9);
+}
+
+.btn-warning.example-btn {
+    background: rgba(243, 156, 18, 0.8);
+    border-color: rgba(243, 156, 18, 0.9);
+}
+
+.btn-success.example-btn {
+    background: rgba(39, 174, 96, 0.8);
+    border-color: rgba(39, 174, 96, 0.9);
+}
+
+/* Indicador de reordenamiento SJF */
+.sjf-reorder-indicator {
+    background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    animation: pulse 2s infinite;
+}
+
+.sjf-reorder-indicator i {
+    font-size: 1.5rem;
+    color: #ffeaa7;
+}
+
+.sjf-reorder-indicator strong {
+    color: #ffeaa7;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+    50% {
+        box-shadow: 0 5px 25px rgba(255, 107, 107, 0.5);
+    }
+    100% {
+        box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+}
+
+/* Animaciones adicionales */
+@keyframes slideInFromRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Estilos específicos para algoritmos */
+.algorithm-info {
+    display: none;
+}
+
+.algorithm-info.active {
+    display: block;
+}
+
+/* Estilos específicos para SJF */
+.sjf-mode .at-column {
+    background-color: #ffeaea !important;
+    color: #e74c3c !important;
+    font-weight: bold;
+    position: relative;
+}
+
+.sjf-mode .at-column::after {
+    content: " ⚠️";
+    color: #e74c3c;
+    font-size: 0.8em;
+}
+
+.sjf-mode .bt-column {
+    background-color: #e8f5e8 !important;
+    color: #27ae60 !important;
+    font-weight: bold;
+    border: 2px solid #27ae60;
+}
+
+.sjf-mode .process-cell {
+    background-color: #f0f8ff !important;
+}
+
+/* Indicador visual de reordenamiento SJF */
+.sjf-reorder-indicator {
+    background: linear-gradient(45deg, #f39c12, #e67e22);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(243, 156, 18, 0.3);
+}
+
+.sjf-reorder-indicator i {
+    margin-right: 8px;
+}
+
+/* Gantt chart específico para SJF */
+.sjf-mode .gantt-process {
+    background: linear-gradient(45deg, #27ae60, #229954);
+    position: relative;
+}
+
+.sjf-mode .gantt-process::before {
+    content: "SJF";
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    color: #27ae60;
+    font-weight: bold;
 }
 
 /* Responsive Design */
