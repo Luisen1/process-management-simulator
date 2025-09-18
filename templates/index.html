@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Planificación de Procesos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1><i class="fas fa-microchip"></i> Simulador de Planificación de Procesos</h1>
+            <p class="subtitle">Algoritmo Actual: <span id="current-algorithm">{{ current_algorithm }}</span></p>
+        </header>
+
+        <!-- Panel de Control -->
+        <div class="control-panel">
+            <div class="algorithm-selector">
+                <label for="algorithm-select">Seleccionar Algoritmo:</label>
+                <select id="algorithm-select">
+                    <option value="FCFS" {% if current_algorithm == 'FCFS' %}selected{% endif %}>FCFS (First-Come, First-Served)</option>
+                    <!-- Espacio para futuros algoritmos -->
+                    <option value="SJF" disabled>SJF (Próximamente)</option>
+                    <option value="RR" disabled>Round Robin (Próximamente)</option>
+                </select>
+                <button id="change-algorithm-btn" class="btn btn-secondary">
+                    <i class="fas fa-sync-alt"></i> Cambiar Algoritmo
+                </button>
+            </div>
+        </div>
+
+        <!-- Formulario para añadir procesos -->
+        <div class="process-form">
+            <h2><i class="fas fa-plus"></i> Añadir Proceso</h2>
+            <form id="process-form">
+                <div class="form-group">
+                    <label for="process-id">ID del Proceso:</label>
+                    <input type="text" id="process-id" name="pid" placeholder="Ej: P1, P2, P3..." required>
+                </div>
+                <div class="form-group">
+                    <label for="arrival-time">Tiempo de Llegada (AT):</label>
+                    <input type="number" id="arrival-time" name="arrival_time" min="0" placeholder="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="burst-time">Tiempo de Ráfaga (BT):</label>
+                    <input type="number" id="burst-time" name="burst_time" min="1" placeholder="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Añadir Proceso
+                </button>
+            </form>
+        </div>
+
+        <!-- Lista de procesos añadidos -->
+        <div class="process-list">
+            <h3><i class="fas fa-list"></i> Procesos Añadidos</h3>
+            <div id="added-processes">
+                <p class="no-processes">No hay procesos añadidos aún.</p>
+            </div>
+            <div class="process-actions">
+                <button id="schedule-btn" class="btn btn-success" disabled>
+                    <i class="fas fa-play"></i> Ejecutar Planificación
+                </button>
+                <button id="reset-btn" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Reiniciar
+                </button>
+            </div>
+        </div>
+
+        <!-- Resultados -->
+        <div id="results-section" class="results-section" style="display: none;">
+            <h2><i class="fas fa-chart-bar"></i> Resultados de la Planificación</h2>
+            
+            <!-- Diagrama de Gantt -->
+            <div class="gantt-section">
+                <h3><i class="fas fa-chart-gantt"></i> Diagrama de Gantt</h3>
+                <div id="gantt-chart" class="gantt-chart"></div>
+                <div id="gantt-timeline" class="gantt-timeline"></div>
+            </div>
+
+            <!-- Tabla de resultados -->
+            <div class="table-section">
+                <h3><i class="fas fa-table"></i> Tabla de Resultados</h3>
+                <div class="table-container">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>Proceso</th>
+                                <th>AT</th>
+                                <th>BT</th>
+                                <th>CT</th>
+                                <th>TT</th>
+                                <th>WT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los resultados se llenarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Métricas promedio -->
+            <div class="metrics-section">
+                <h3><i class="fas fa-calculator"></i> Métricas</h3>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <i class="fas fa-clock"></i>
+                        <h4>Tiempo Promedio de Espera</h4>
+                        <p id="avg-waiting-time">-</p>
+                    </div>
+                    <div class="metric-card">
+                        <i class="fas fa-hourglass-half"></i>
+                        <h4>Tiempo Promedio de Turnaround</h4>
+                        <p id="avg-turnaround-time">-</p>
+                    </div>
+                    <div class="metric-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h4>Efecto Convoy</h4>
+                        <p id="convoy-effect">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes de estado -->
+        <div id="messages" class="messages"></div>
+    </div>
+
+    <!-- Explicación del algoritmo -->
+    <div class="info-section">
+        <h3><i class="fas fa-info-circle"></i> Información del Algoritmo FCFS</h3>
+        <div class="info-content">
+            <p><strong>First-Come, First-Served (FCFS)</strong> es el algoritmo de planificación más simple:</p>
+            <ul>
+                <li><strong>AT (Arrival Time):</strong> Momento en que el proceso llega al sistema</li>
+                <li><strong>BT (Burst Time):</strong> Tiempo que el proceso necesita para completarse</li>
+                <li><strong>CT (Completion Time):</strong> Momento en que el proceso termina su ejecución</li>
+                <li><strong>TT (Turnaround Time):</strong> CT - AT (tiempo total en el sistema)</li>
+                <li><strong>WT (Waiting Time):</strong> TT - BT (tiempo esperando para ejecutarse)</li>
+                <li><strong>Convoy Effect:</strong> Los procesos largos pueden retrasar significativamente a los cortos</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
