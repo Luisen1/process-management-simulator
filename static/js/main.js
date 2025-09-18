@@ -1,6 +1,7 @@
 // Variables globales
 let processes = [];
 let currentResults = null;
+let currentQuantum = 3;
 
 // Elementos del DOM
 const processForm = document.getElementById('process-form');
@@ -12,6 +13,12 @@ const messagesDiv = document.getElementById('messages');
 const addedProcessesDiv = document.getElementById('added-processes');
 const resultsSection = document.getElementById('results-section');
 
+// Elementos específicos de Round Robin
+const quantumControl = document.getElementById('quantum-control');
+const quantumInput = document.getElementById('quantum-input');
+const setQuantumBtn = document.getElementById('set-quantum-btn');
+const currentQuantumSpan = document.getElementById('current-quantum');
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
     loadCurrentState();
@@ -20,6 +27,16 @@ document.addEventListener('DOMContentLoaded', function() {
     scheduleBtn.addEventListener('click', scheduleProcesses);
     resetBtn.addEventListener('click', resetScheduler);
     changeAlgorithmBtn.addEventListener('click', changeAlgorithm);
+    
+    // Event listener para Round Robin
+    if (setQuantumBtn) {
+        setQuantumBtn.addEventListener('click', setQuantum);
+    }
+    
+    // Event listener para cambio de algoritmo
+    algorithSelect.addEventListener('change', function() {
+        updateAlgorithmInterface(this.value);
+    });
 });
 
 // Función para mostrar mensajes
@@ -135,6 +152,12 @@ async function resetScheduler() {
 // Función para cambiar algoritmo
 async function changeAlgorithm() {
     const selectedAlgorithm = algorithSelect.value;
+    const requestData = { algorithm: selectedAlgorithm };
+    
+    // Si es Round Robin, incluir el quantum actual
+    if (selectedAlgorithm === 'RR') {
+        requestData.quantum = currentQuantum;
+    }
     
     try {
         const response = await fetch('/change_algorithm', {
@@ -142,7 +165,7 @@ async function changeAlgorithm() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ algorithm: selectedAlgorithm })
+            body: JSON.stringify(requestData)
         });
         
         const result = await response.json();
@@ -168,6 +191,38 @@ async function changeAlgorithm() {
     }
 }
 
+// Función para configurar quantum
+async function setQuantum() {
+    const quantum = parseInt(quantumInput.value);
+    
+    if (!quantum || quantum <= 0) {
+        showMessage('El quantum debe ser un número entero positivo', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/set_quantum', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantum: quantum })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            currentQuantum = quantum;
+            currentQuantumSpan.textContent = `Quantum actual: ${quantum}`;
+            showMessage(result.message, 'success');
+        } else {
+            showMessage(result.message, 'error');
+        }
+    } catch (error) {
+        showMessage(`Error de conexión: ${error.message}`, 'error');
+    }
+}
+
 // Función para mostrar diferencias del algoritmo
 function showAlgorithmDifferences(algorithm) {
     let message = '';
@@ -177,6 +232,9 @@ function showAlgorithmDifferences(algorithm) {
     } else if (algorithm === 'FCFS') {
         message = `🔄 Cambiado a FCFS: Los procesos se ordenarán por <strong>Arrival Time</strong> (AT), respetando el orden de llegada. 
                    Es justo pero puede tener el "efecto convoy".`;
+    } else if (algorithm === 'RR') {
+        message = `🔄 Cambiado a Round Robin: Los procesos se ejecutarán en turnos de <strong>${currentQuantum} unidades de tiempo</strong>. 
+                   Es preemptivo y equitativo, pero genera cambios de contexto. Puedes ajustar el quantum según necesites.`;
     }
     
     if (message) {
@@ -195,6 +253,13 @@ async function loadCurrentState() {
         processes = state.processes || [];
         document.getElementById('current-algorithm').textContent = state.algorithm;
         algorithSelect.value = state.algorithm;
+        
+        // Cargar quantum si está disponible
+        if (state.quantum !== null && state.quantum !== undefined) {
+            currentQuantum = state.quantum;
+            if (quantumInput) quantumInput.value = currentQuantum;
+            if (currentQuantumSpan) currentQuantumSpan.textContent = `Quantum actual: ${currentQuantum}`;
+        }
         
         updateProcessList();
         updateAlgorithmInterface(state.algorithm);
@@ -236,11 +301,18 @@ function displayResults(results) {
     // Mostrar métricas
     displayMetrics(results);
     
+    // Mostrar estadísticas si están disponibles
+    if (results.statistics) {
+        displayStatistics(results.statistics);
+    }
+    
     // Mostrar análisis específico del algoritmo
     if (currentAlgorithm === 'SJF') {
         showSJFAnalysis(results.processes);
     } else if (currentAlgorithm === 'FCFS') {
         showFCFSAnalysis(results);
+    } else if (currentAlgorithm === 'RR') {
+        showRRAnalysis(results);
     }
     
     // Scroll a resultados
@@ -275,18 +347,32 @@ function showFCFSAnalysis(results) {
 // Función para mostrar tabla de resultados
 function displayResultsTable(processes) {
     const tbody = document.querySelector('#results-table tbody');
+    const quantumColumn = document.getElementById('quantum-column');
+    const ntatColumn = document.getElementById('ntat-column');
+    
     tbody.innerHTML = '';
     
     const currentAlgorithm = document.getElementById('current-algorithm').textContent;
     
+    // Mostrar/ocultar columnas específicas para Round Robin
+    if (quantumColumn && ntatColumn) {
+        if (currentAlgorithm === 'RR') {
+            quantumColumn.style.display = 'table-cell';
+            ntatColumn.style.display = 'table-cell';
+        } else {
+            quantumColumn.style.display = 'none';
+            ntatColumn.style.display = 'none';
+        }
+    }
+    
     processes.forEach(process => {
         const row = document.createElement('tr');
         
-        // Aplicar clases específicas para SJF
+        // Aplicar clases específicas para algoritmos
         const atClass = currentAlgorithm === 'SJF' ? 'at-column' : '';
         const btClass = currentAlgorithm === 'SJF' ? 'bt-column' : '';
         
-        row.innerHTML = `
+        let rowHTML = `
             <td class="process-cell">${process.pid}</td>
             <td class="${atClass}">${process.arrival_time}</td>
             <td class="${btClass}">${process.burst_time}</td>
@@ -294,6 +380,16 @@ function displayResultsTable(processes) {
             <td>${process.turnaround_time}</td>
             <td>${process.waiting_time}</td>
         `;
+        
+        // Añadir columnas específicas para Round Robin
+        if (currentAlgorithm === 'RR') {
+            const quantumUsed = process.quantum_used || 0;
+            const ntat = process.normalized_turnaround_time || 0;
+            rowHTML += `<td class="quantum-cell">${quantumUsed}</td>`;
+            rowHTML += `<td class="ntat-cell">${ntat}</td>`;
+        }
+        
+        row.innerHTML = rowHTML;
         tbody.appendChild(row);
     });
 }
@@ -376,13 +472,24 @@ function updateAlgorithmInterface(algorithm) {
     const body = document.body;
     const fcfsInfo = document.getElementById('fcfs-info');
     const sjfInfo = document.getElementById('sjf-info');
+    const rrInfo = document.getElementById('rr-info');
     
     // Remover clases previas
-    body.classList.remove('sjf-mode', 'fcfs-mode');
+    body.classList.remove('sjf-mode', 'fcfs-mode', 'rr-mode');
     
     // Ocultar todas las secciones de información
     if (fcfsInfo) fcfsInfo.style.display = 'none';
     if (sjfInfo) sjfInfo.style.display = 'none';
+    if (rrInfo) rrInfo.style.display = 'none';
+    
+    // Mostrar/ocultar control de quantum
+    if (quantumControl) {
+        if (algorithm === 'RR') {
+            quantumControl.style.display = 'block';
+        } else {
+            quantumControl.style.display = 'none';
+        }
+    }
     
     // Aplicar configuración específica del algoritmo
     if (algorithm === 'SJF') {
@@ -394,6 +501,12 @@ function updateAlgorithmInterface(algorithm) {
     } else if (algorithm === 'FCFS') {
         body.classList.add('fcfs-mode');
         if (fcfsInfo) fcfsInfo.style.display = 'block';
+    } else if (algorithm === 'RR') {
+        body.classList.add('rr-mode');
+        if (rrInfo) rrInfo.style.display = 'block';
+        
+        // Mostrar información de Round Robin
+        showRRInfo();
     }
 }
 
@@ -419,6 +532,28 @@ function showSJFWarning() {
     resultsSection.parentNode.insertBefore(warning, resultsSection);
 }
 
+// Función para mostrar información de Round Robin
+function showRRInfo() {
+    // Remover información previa si existe
+    const existingInfo = document.querySelector('.rr-info-indicator');
+    if (existingInfo) {
+        existingInfo.remove();
+    }
+    
+    // Crear nueva información
+    const info = document.createElement('div');
+    info.className = 'rr-info-indicator';
+    info.innerHTML = `
+        <i class="fas fa-sync-alt"></i>
+        <strong>Algoritmo Round Robin Activo:</strong> Los procesos se ejecutarán en turnos de ${currentQuantum} unidades. 
+        Es preemptivo y equitativo. Ajusta el quantum para optimizar el rendimiento.
+    `;
+    
+    // Insertar antes de la sección de resultados
+    const resultsSection = document.getElementById('results-section');
+    resultsSection.parentNode.insertBefore(info, resultsSection);
+}
+
 // Función para mostrar métricas (actualizada para SJF)
 function displayMetrics(results) {
     document.getElementById('avg-waiting-time').textContent = 
@@ -430,4 +565,59 @@ function displayMetrics(results) {
     // Mostrar información específica del algoritmo
     const analysisText = results.algorithm_analysis || results.convoy_effect_info || 'N/A';
     document.getElementById('convoy-effect').textContent = analysisText;
+}
+
+// Función para mostrar estadísticas detalladas
+function displayStatistics(statistics) {
+    const statisticsSection = document.getElementById('statistics-section');
+    const statisticsTable = document.getElementById('statistics-table');
+    
+    if (!statisticsSection || !statisticsTable) return;
+    
+    const tbody = statisticsTable.querySelector('tbody');
+    tbody.innerHTML = '';
+    
+    // Definir nombres amigables para las métricas
+    const metricNames = {
+        'arrival_time': 'Tiempo de Llegada (AT)',
+        'burst_time': 'Tiempo de Ráfaga (BT)',
+        'completion_time': 'Tiempo de Finalización (CT)',
+        'turnaround_time': 'Tiempo de Turnaround (TT)',
+        'waiting_time': 'Tiempo de Espera (WT)',
+        'quantum_used': 'Quantum Usado (QU)',
+        'normalized_turnaround_time': 'Tiempo Normalizado (NTAT)'
+    };
+    
+    // Crear filas para cada métrica
+    Object.entries(statistics).forEach(([metric, stats]) => {
+        const row = document.createElement('tr');
+        const metricDisplayName = metricNames[metric] || metric;
+        
+        row.innerHTML = `
+            <td><strong>${metricDisplayName}</strong></td>
+            <td>${stats.mean}</td>
+            <td>${stats.std_dev}</td>
+            <td>${stats.min}</td>
+            <td>${stats.max}</td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    // Mostrar la sección de estadísticas
+    statisticsSection.style.display = 'block';
+}
+
+// Función para análisis específico de Round Robin
+function showRRAnalysis(results) {
+    // Obtener información de Round Robin del análisis
+    const analysis = results.analysis || '';
+    const contextSwitches = analysis.match(/(\d+) cambios de contexto/) ? 
+                           analysis.match(/(\d+) cambios de contexto/)[1] : 'N/A';
+    
+    setTimeout(() => {
+        showMessage(
+            `⚙️ Round Robin: Quantum ${currentQuantum} | ${contextSwitches} cambios de contexto | ${analysis}`, 
+            'info'
+        );
+    }, 1000);
 }
