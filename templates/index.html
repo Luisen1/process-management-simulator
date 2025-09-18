@@ -21,12 +21,21 @@
                 <select id="algorithm-select">
                     <option value="FCFS" {% if current_algorithm == 'FCFS' %}selected{% endif %}>FCFS (First-Come, First-Served)</option>
                     <option value="SJF" {% if current_algorithm == 'SJF' %}selected{% endif %}>SJF (Shortest Job First)</option>
-                    <!-- Espacio para futuros algoritmos -->
-                    <option value="RR" disabled>Round Robin (Próximamente)</option>
+                    <option value="RR" {% if current_algorithm == 'RR' %}selected{% endif %}>Round Robin</option>
                 </select>
                 <button id="change-algorithm-btn" class="btn btn-secondary">
                     <i class="fas fa-sync-alt"></i> Cambiar Algoritmo
                 </button>
+            </div>
+            
+            <!-- Control de Quantum para Round Robin -->
+            <div id="quantum-control" class="quantum-control" style="display: none;">
+                <label for="quantum-input">Quantum (unidades de tiempo):</label>
+                <input type="number" id="quantum-input" name="quantum" min="1" max="20" value="3" placeholder="3">
+                <button id="set-quantum-btn" class="btn btn-info">
+                    <i class="fas fa-cog"></i> Configurar Quantum
+                </button>
+                <span id="current-quantum" class="quantum-display">Quantum actual: 3</span>
             </div>
         </div>
 
@@ -92,6 +101,8 @@
                                 <th>CT</th>
                                 <th>TT</th>
                                 <th>WT</th>
+                                <th id="quantum-column" style="display: none;">QU</th>
+                                <th id="ntat-column" style="display: none;">NTAT</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -120,6 +131,35 @@
                         <h4>Efecto Convoy</h4>
                         <p id="convoy-effect">-</p>
                     </div>
+                </div>
+            </div>
+            
+            <!-- Estadísticas Detalladas -->
+            <div id="statistics-section" class="statistics-section" style="display: none;">
+                <h3><i class="fas fa-chart-line"></i> Estadísticas Detalladas</h3>
+                <div class="statistics-container">
+                    <table id="statistics-table" class="statistics-table">
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Media (μ)</th>
+                                <th>Desv. Estándar (σ)</th>
+                                <th>Mínimo</th>
+                                <th>Máximo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Las estadísticas se llenarán dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="statistics-info">
+                    <p><i class="fas fa-info-circle"></i> <strong>Interpretación:</strong></p>
+                    <ul>
+                        <li><strong>Media (μ):</strong> Valor promedio de la métrica</li>
+                        <li><strong>Desviación Estándar (σ):</strong> Medida de dispersión (valores más altos indican mayor variabilidad)</li>
+                        <li><strong>Mínimo/Máximo:</strong> Rango de valores observados</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -174,6 +214,44 @@
                 <div class="algorithm-warning">
                     <h4><i class="fas fa-exclamation-triangle"></i> ¿Por qué es "Injusto"?</h4>
                     <p>SJF prioriza los procesos más cortos sin importar cuándo llegaron. Un proceso que llega primero pero es largo puede ejecutarse después de procesos que llegaron mucho más tarde pero son más cortos. Esto viola el principio de "primero en llegar, primero en ser atendido".</p>
+                </div>
+            </div>
+            <div id="rr-info" class="algorithm-info" style="display: none;">
+                <p><strong>Round Robin (RR)</strong> es un algoritmo preemptivo que proporciona equidad temporal:</p>
+                <ul>
+                    <li><strong>AT (Arrival Time):</strong> Momento en que el proceso llega al sistema</li>
+                    <li><strong>BT (Burst Time):</strong> Tiempo que el proceso necesita para completarse</li>
+                    <li><strong>CT (Completion Time):</strong> Momento en que el proceso termina su ejecución</li>
+                    <li><strong>TT (Turnaround Time):</strong> CT - AT (tiempo total en el sistema)</li>
+                    <li><strong>WT (Waiting Time):</strong> TT - BT (tiempo esperando para ejecutarse)</li>
+                    <li><strong style="color: #3498db;">QU (Quantum Used):</strong> <span style="color: #3498db;">✨ Cantidad total de unidades de quantum que usó el proceso</span></li>
+                    <li><strong style="color: #e67e22;">NTAT (Normalized TAT):</strong> <span style="color: #e67e22;">📊 TT/BT - Tiempo de turnaround normalizado</span></li>
+                </ul>
+                <div class="algorithm-characteristics">
+                    <h4><i class="fas fa-star"></i> Características de Round Robin:</h4>
+                    <ul>
+                        <li>✅ <strong>Preemptivo:</strong> Los procesos pueden ser interrumpidos</li>
+                        <li>✅ <strong>Justo:</strong> Todos los procesos reciben tiempo de CPU equitativamente</li>
+                        <li>✅ <strong>Responsivo:</strong> Buena respuesta interactiva</li>
+                        <li>⚠️ <strong>Context Switching:</strong> Genera cambios de contexto</li>
+                        <li>⚠️ <strong>Quantum Crítico:</strong> El rendimiento depende del valor del quantum</li>
+                    </ul>
+                </div>
+                <div class="algorithm-insights">
+                    <h4><i class="fas fa-lightbulb"></i> Configuración del Quantum:</h4>
+                    <ul>
+                        <li><strong>Quantum Pequeño (1-2):</strong> Mayor equidad, pero más overhead por cambios de contexto</li>
+                        <li><strong>Quantum Mediano (3-5):</strong> Buen balance entre equidad y eficiencia</li>
+                        <li><strong>Quantum Grande (>10):</strong> Se aproxima a FCFS, menos cambios de contexto</li>
+                    </ul>
+                    <div class="formula-box">
+                        <h5><i class="fas fa-calculator"></i> Fórmulas Importantes:</h5>
+                        <ul>
+                            <li><strong>TT = CT - AT</strong> (Turnaround Time)</li>
+                            <li><strong>WT = TT - BT</strong> (Waiting Time)</li>
+                            <li><strong>NTAT = TT / BT</strong> (Normalized Turnaround Time)</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
