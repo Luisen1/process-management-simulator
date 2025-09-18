@@ -57,7 +57,7 @@ function loadExampleData(exampleKey) {
     }
     
     // Limpiar procesos actuales
-    resetScheduler().then(() => {
+    resetScheduler().then(() => {class
         // Mostrar información del ejemplo
         showMessage(`📖 Cargando ejemplo: ${example.name} - ${example.description}`, 'info');
         
