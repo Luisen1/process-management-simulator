@@ -1,177 +1,164 @@
-# Simulador de Planificación de Procesos
+# 🖥️ Simulador de Gestión de Procesos
 
-Una aplicación web desarrollada en Flask para simular y visualizar algoritmos de planificación de procesos del sistema operativo.
+Una aplicación web interactiva desarrollada en **Flask** que simula algoritmos de planificación de procesos para sistemas operativos. Implementa los algoritmos **FCFS (First-Come, First-Served)** y **SJF (Shortest Job First)** con visualizaciones en tiempo real.
 
-## Características
+## ✨ Características Principales
 
-### ✅ Implementado
-- **Algoritmo FCFS (First-Come, First-Served)**
-- **Interfaz web interactiva** con formularios dinámicos
-- **Diagrama de Gantt visual** que muestra la ejecución de procesos
-- **Tabla de resultados** con todos los tiempos calculados
-- **Métricas de rendimiento** (tiempo promedio de espera, turnaround, análisis de convoy effect)
-- **Diseño responsive** que funciona en dispositivos móviles
+### 🎯 Algoritmos Implementados
+- **FCFS (First-Come, First-Served)**: Algoritmo justo que respeta el orden de llegada
+- **SJF (Shortest Job First)**: Algoritmo óptimo que prioriza procesos con menor tiempo de ráfaga
 
-### 🔜 Próximamente
-- Algoritmo SJF (Shortest Job First)
-- Algoritmo Round Robin
+### 📊 Visualizaciones Interactivas
+- **Diagramas de Gantt**: Representación visual de la ejecución de procesos
+- **Tablas de Resultados**: Métricas detalladas (AT, BT, CT, TT, WT)
+- **Indicadores Visuales**: Diferenciación por colores según el algoritmo
 
-## Instalación y Uso
+### 🛠️ Funcionalidades Avanzadas
+- **Ejemplos Predefinidos**: Casos que demuestran claramente las diferencias entre algoritmos
+- **Cambio Dinámico**: Alternancia entre algoritmos sin reiniciar la aplicación
+- **Análisis Automático**: Detección del efecto convoy y análisis de rendimiento
+- **Interfaz Responsiva**: Compatible con dispositivos móviles y de escritorio
 
-### Prerequisitos
-- Python 3.7 o superior
-- pip (gestor de paquetes de Python)
+## 🚀 Instalación y Configuración
 
-### Instalación
+### Prerrequisitos
+- **Python 3.7+**
+- **pip** (gestor de paquetes de Python)
 
-1. **Clonar o descargar el proyecto**
-   ```bash
-   cd process-management-simulator
-   ```
+### 1. Clonar el Repositorio
+```bash
+git clone https://github.com/Luisen1/process-management-simulator.git
+cd process-management-simulator
+```
 
-2. **Crear entorno virtual (recomendado)**
-   ```bash
-   python -m venv venv
-   ```
+### 2. Crear Entorno Virtual (Recomendado)
+```bash
+python -m venv venv
 
-3. **Activar entorno virtual**
-   - Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-   - Linux/macOS:
-     ```bash
-     source venv/bin/activate
-     ```
+# Windows
+venv\Scripts\activate
 
-4. **Instalar dependencias**
-   ```bash
-   pip install flask
-   ```
+# Linux/Mac
+source venv/bin/activate
+```
 
-### Ejecución
+### 3. Instalar Dependencias
+```bash
+pip install -r requirements.txt
+```
 
-1. **Ejecutar la aplicación**
-   ```bash
-   python app.py
-   ```
+### 4. Ejecutar la Aplicación
+```bash
+python app.py
+```
 
-2. **Abrir navegador**
-   - Ir a: http://localhost:5000
+### 5. Acceder a la Aplicación
+Abrir el navegador y visitar: `http://127.0.0.1:5000`
 
-## Uso de la Aplicación
+## 📖 Guía de Uso
 
-### 1. Añadir Procesos
-- Ingresa el ID del proceso (ej: P1, P2, P3)
-- Especifica el Tiempo de Llegada (AT)
-- Especifica el Tiempo de Ráfaga (BT)
-- Haz clic en "Añadir Proceso"
+### Añadir Procesos
+1. **PID**: Identificador único del proceso (ej: P1, P2, P3)
+2. **Arrival Time (AT)**: Momento en que el proceso llega al sistema
+3. **Burst Time (BT)**: Tiempo que el proceso necesita para completarse
 
-### 2. Ejecutar Planificación
-- Una vez añadidos los procesos, haz clic en "Ejecutar Planificación"
-- La aplicación calculará y mostrará:
-  - Diagrama de Gantt visual
-  - Tabla con todos los tiempos calculados
-  - Métricas de rendimiento
+### Cambiar Algoritmo
+- Utiliza el selector de algoritmos para alternar entre **FCFS** y **SJF**
+- La interfaz se actualiza automáticamente mostrando información específica
 
-### 3. Interpretar Resultados
+### Ejemplos Predefinidos
+- **FCFS vs SJF**: Demuestra las diferencias fundamentales entre algoritmos
+- **Efecto Convoy**: Muestra cómo procesos largos afectan a los cortos en FCFS
+- **Valores de Referencia**: Datos específicos para validación académica
 
-#### Columnas de la tabla:
-- **Proceso**: ID del proceso
-- **AT**: Arrival Time (tiempo de llegada)
-- **BT**: Burst Time (tiempo de ráfaga)
-- **CT**: Completion Time (tiempo de finalización)
-- **TT**: Turnaround Time (tiempo total en el sistema)
-- **WT**: Waiting Time (tiempo de espera)
+## 🧮 Métricas Calculadas
 
-#### Fórmulas:
-- **CT**: Se calcula según el orden de ejecución FCFS
-- **TT = CT - AT**: Tiempo total que el proceso está en el sistema
-- **WT = TT - BT**: Tiempo que el proceso espera antes de ejecutarse
+### Tiempos Fundamentales
+- **AT (Arrival Time)**: Tiempo de llegada al sistema
+- **BT (Burst Time)**: Tiempo de ejecución requerido
+- **CT (Completion Time)**: Tiempo de finalización
+- **TT (Turnaround Time)**: Tiempo total en el sistema (CT - AT)
+- **WT (Waiting Time)**: Tiempo en cola de espera (TT - BT)
 
-## Estructura del Proyecto
+### Métricas de Rendimiento
+- **Tiempo Promedio de Espera**: Media de todos los tiempos de espera
+- **Tiempo Promedio de Turnaround**: Media de todos los tiempos de turnaround
+- **Análisis de Eficiencia**: Comparación entre algoritmos
+
+## 🎨 Diferencias Visuales
+
+### FCFS (First-Come, First-Served)
+- 🟦 **Interfaz Azul**: Representa orden y justicia
+- 📝 **Ordenamiento**: Por Arrival Time (AT)
+- ⚖️ **Características**: Justo pero puede ser ineficiente
+
+### SJF (Shortest Job First)
+- 🟩 **Elementos Verdes**: Burst Time resaltado
+- 🔴 **Elementos Rojos**: Arrival Time (ignorado en ordenamiento)
+- ⚡ **Características**: Eficiente pero injusto
+
+## 📁 Estructura del Proyecto
 
 ```
 process-management-simulator/
 ├── app.py                 # Aplicación Flask principal
-├── process.py            # Clases de procesos y algoritmos
-├── templates/
-│   └── index.html        # Interfaz web principal
+├── process.py            # Lógica de algoritmos de scheduling
+├── requirements.txt      # Dependencias del proyecto
+├── README.md            # Documentación del proyecto
 ├── static/
 │   ├── css/
-│   │   └── style.css     # Estilos de la aplicación
+│   │   └── style.css    # Estilos CSS responsivos
 │   └── js/
-│       └── main.js       # Funcionalidad JavaScript
-└── README.md            # Este archivo
+│       ├── main.js      # Lógica principal del frontend
+│       └── examples.js  # Ejemplos predefinidos
+└── templates/
+    └── index.html       # Plantilla HTML principal
 ```
 
-## Algoritmo FCFS
+## 🔧 Arquitectura Técnica
 
-**First-Come, First-Served** es el algoritmo de planificación más simple:
+### Backend (Flask)
+- **Patrón Factory**: Para creación de schedulers
+- **API RESTful**: Endpoints para gestión de procesos
+- **Separación de Responsabilidades**: Lógica de negocio independiente
 
-### Características:
-- Los procesos se ejecutan en orden de llegada
-- No es preemptivo (un proceso no puede ser interrumpido)
-- Simple de implementar y entender
-- Puede sufrir del "Convoy Effect"
+### Frontend
+- **JavaScript Vanilla**: Sin dependencias externas
+- **CSS Grid/Flexbox**: Layout responsivo moderno
+- **Fetch API**: Comunicación asíncrona con el backend
 
-### Convoy Effect:
-Ocurre cuando procesos largos llegan primero y retrasan significativamente a los procesos cortos que llegan después, causando:
-- Aumento en el tiempo promedio de espera
-- Reducción en la eficiencia del sistema
-- Mala experiencia para procesos cortos
+### Algoritmos
+- **FCFS**: Ordenamiento por arrival_time
+- **SJF**: Ordenamiento por burst_time
+- **Cálculos Específicos**: Métodos diferenciados para cada algoritmo
 
-## Desarrollo y Extensibilidad
+## 🎓 Casos de Uso Educativos
 
-La aplicación está diseñada para ser fácilmente extensible:
+### Demostración de Conceptos
+- **Efecto Convoy**: Cómo procesos largos bloquean a los cortos
+- **Starvation**: Procesos largos que nunca se ejecutan en SJF
+- **Trade-offs**: Justicia vs Eficiencia en sistemas operativos
 
-### Añadir nuevos algoritmos:
+### Ejemplos Recomendados
+1. **Convoy Effect**: P1(AT=0,BT=20), P2(AT=1,BT=1), P3(AT=2,BT=1)
+2. **SJF Optimization**: P1(AT=0,BT=8), P2(AT=1,BT=2), P3(AT=2,BT=1)
+3. **Fair vs Efficient**: Comparar métricas entre ambos algoritmos
 
-1. **Crear nueva clase scheduler** en `process.py`:
-   ```python
-   class SJFScheduler:
-       def __init__(self):
-           # Implementación
-       
-       def schedule(self):
-           # Lógica del algoritmo
-   ```
+## 🤝 Contribuciones
 
-2. **Actualizar SchedulerFactory** en `process.py`:
-   ```python
-   @staticmethod
-   def create_scheduler(algorithm_type):
-       if algorithm_type.upper() == 'SJF':
-           return SJFScheduler()
-   ```
+Las contribuciones son bienvenidas. Para contribuir:
 
-3. **Añadir opción en HTML** (templates/index.html):
-   ```html
-   <option value="SJF">SJF (Shortest Job First)</option>
-   ```
+1. Fork el repositorio
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Añadir nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
 
-### Estructura de clases:
-- **Process**: Representa un proceso individual
-- **FCFSScheduler**: Implementa el algoritmo FCFS
-- **SchedulerFactory**: Factory pattern para crear schedulers
-- **Flask App**: API REST para la interfaz web
+## 📄 Licencia
 
-## Tecnologías Utilizadas
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-- **Backend**: Python 3.x, Flask
-- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
-- **Diseño**: CSS Grid, Flexbox, Gradientes
-- **Iconos**: Font Awesome
-- **Arquitectura**: MVC pattern, Factory pattern
+## 👨‍💻 Autor
 
-
-## Licencia
-
-Este proyecto es de código abierto y está disponible para uso educativo.
-
-## Soporte
-
-Si encuentras algún problema o tienes sugerencias, por favor abre un issue en el repositorio.
-## 👥 Author
-
-- **Luis Enrique Hernández Valbuena** - [@Luisen1](https://github.com/Luisen1)
+**Luis Enrique** - Estudiante de Sistemas Operativos  
+*8vo Semestre - Entregable de Materia Sistemas Operativos - Punto 4.1*
