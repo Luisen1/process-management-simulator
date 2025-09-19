@@ -414,6 +414,87 @@ function displayGanttChart(ganttData) {
     // Calcular tiempo total
     const totalTime = Math.max(...ganttData.map(item => item.end));
     
+    // Crear contenedor para indicadores de llegada
+    const arrivalIndicators = document.createElement('div');
+    arrivalIndicators.className = 'arrival-indicators';
+    arrivalIndicators.style.cssText = `
+        position: relative;
+        height: 25px;
+        margin-bottom: 5px;
+        border-bottom: 2px solid #3498db;
+        background: linear-gradient(to right, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+    `;
+    
+    // Obtener información de llegada de procesos desde currentResults
+    if (currentResults && currentResults.processes) {
+        const processArrivalInfo = new Map();
+        currentResults.processes.forEach(process => {
+            processArrivalInfo.set(process.pid, {
+                arrival_time: process.arrival_time,
+                color: getProcessColor(process.pid)
+            });
+        });
+        
+        // Crear indicadores de llegada únicos
+        const addedArrivals = new Set();
+        processArrivalInfo.forEach((info, pid) => {
+            const arrivalTime = info.arrival_time;
+            const arrivalKey = `${arrivalTime}`;
+            
+            if (!addedArrivals.has(arrivalKey)) {
+                addedArrivals.add(arrivalKey);
+                
+                // Obtener todos los procesos que llegan en este tiempo
+                const processesAtTime = Array.from(processArrivalInfo.entries())
+                    .filter(([p, i]) => i.arrival_time === arrivalTime)
+                    .map(([p, i]) => p);
+                
+                const arrow = document.createElement('div');
+                arrow.className = 'arrival-arrow';
+                arrow.style.cssText = `
+                    position: absolute;
+                    left: ${(arrivalTime / totalTime) * 100}%;
+                    top: -2px;
+                    width: 0;
+                    height: 0;
+                    border-left: 8px solid transparent;
+                    border-right: 8px solid transparent;
+                    border-top: 12px solid #e74c3c;
+                    transform: translateX(-50%);
+                    z-index: 10;
+                `;
+                arrow.title = `Llegada en t=${arrivalTime}: ${processesAtTime.join(', ')}`;
+                
+                // Etiqueta con el número del proceso directamente en la flecha
+                const processLabel = document.createElement('div');
+                processLabel.className = 'process-number-label';
+                processLabel.style.cssText = `
+                    position: absolute;
+                    left: ${(arrivalTime / totalTime) * 100}%;
+                    top: -20px;
+                    font-size: 11px;
+                    font-weight: bold;
+                    color: #e74c3c;
+                    transform: translateX(-50%);
+                    white-space: nowrap;
+                    text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
+                    background: rgba(255,255,255,0.8);
+                    padding: 1px 4px;
+                    border-radius: 3px;
+                    border: 1px solid #e74c3c;
+                `;
+                // Mostrar los números de proceso separados por coma si hay múltiples
+                processLabel.textContent = processesAtTime.join(',');
+                
+                arrivalIndicators.appendChild(arrow);
+                arrivalIndicators.appendChild(processLabel);
+            }
+        });
+    }
+    
+    // Agregar indicadores de llegada al contenedor principal
+    ganttChart.parentNode.insertBefore(arrivalIndicators, ganttChart);
+    
     // Crear barras del diagrama de Gantt
     ganttData.forEach((item, index) => {
         const bar = document.createElement('div');
@@ -434,8 +515,14 @@ function displayGanttChart(ganttData) {
             bar.innerHTML = `<span class="gantt-label">Idle</span>`;
         }
         
-        // Tooltip
-        bar.title = `${item.type === 'process' ? item.pid : 'Idle'}: ${item.start} - ${item.end} (${item.duration} unidades)`;
+        // Tooltip mejorado
+        if (item.type === 'process' && currentResults && currentResults.processes) {
+            const processInfo = currentResults.processes.find(p => p.pid === item.pid);
+            const arrivalTime = processInfo ? processInfo.arrival_time : 'N/A';
+            bar.title = `${item.pid}: ${item.start} - ${item.end} (${item.duration} unidades)\nLlegada: t=${arrivalTime}`;
+        } else {
+            bar.title = `${item.type === 'process' ? item.pid : 'Idle'}: ${item.start} - ${item.end} (${item.duration} unidades)`;
+        }
         
         ganttChart.appendChild(bar);
     });
