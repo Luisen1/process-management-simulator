@@ -275,6 +275,74 @@ body {
     margin-right: 10px;
 }
 
+/* Indicadores de llegada de procesos */
+.arrival-indicators {
+    position: relative;
+    height: 25px;
+    margin-bottom: 5px;
+    border-bottom: 2px solid #3498db;
+    background: linear-gradient(to right, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+}
+
+.arrival-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 12px solid #e74c3c;
+    transform: translateX(-50%);
+    z-index: 10;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.arrival-arrow:hover {
+    border-top-color: #c0392b;
+    transform: translateX(-50%) scale(1.2);
+}
+
+.process-number-label {
+    position: absolute;
+    font-size: 11px;
+    font-weight: bold;
+    color: #e74c3c;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.8);
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid #e74c3c;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 11;
+}
+
+.arrival-arrow:hover + .process-number-label {
+    color: #c0392b;
+    border-color: #c0392b;
+    background: rgba(255,255,255,0.95);
+    font-size: 12px;
+}
+
+.arrival-label {
+    position: absolute;
+    font-size: 10px;
+    font-weight: bold;
+    color: #e74c3c;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+    transition: all 0.3s ease;
+    pointer-events: none;
+}
+
+.arrival-arrow:hover + .arrival-label {
+    color: #c0392b;
+    font-size: 11px;
+}
+
 .gantt-chart {
     display: flex;
     background: white;
